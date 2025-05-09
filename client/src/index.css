@@ -1,3 +1,94 @@
+@import '@fontsource/press-start-2p';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Prevent FOUC (Flash of Unstyled Content) */
+html, body {
+  visibility: visible;
+  opacity: 1;
+  background-color: #000000;
+}
+
+/* Hide content until styles are loaded */
+.js-loading * {
+  visibility: hidden;
+}
+
+/* 80s Retro Scanlines */
+@keyframes scanline {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
+}
+
+.scanline-background {
+  background-color: #0b132b;
+  background-image: linear-gradient(
+    90deg,
+    rgba(0, 255, 255, 0.1) 1px,
+    transparent 1px
+  );
+  background-size: 100% 2px;
+  animation: scanline 2s linear infinite;
+}
+
+/* Neon Glow Effects with different colors */
+.neon-glow-pink {
+  color: #ff00ff;
+  text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff;
+}
+
+.neon-glow-cyan {
+  color: #00ffff;
+  text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+}
+
+/* Grid Layout */
+.grid-layout {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* Card Styles */
+.prompt-card {
+  border: 1px solid #1c7293;
+  border-radius: 0;
+  background: #0b132b;
+  color: #e0e0e0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prompt-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+/* Button Styles */
+.neon-button {
+  border: 1px solid #1c7293;
+  background: #0b132b;
+  color: #e0e0e0;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+.neon-button:hover {
+  background: #1c7293;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+/* Typography */
+body {
+  font-family: 'Press Start 2P', 'IBM Plex Mono', monospace;
+  background: #000000;
+  color: #e0e0e0;
+}

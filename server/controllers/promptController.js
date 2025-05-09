@@ -1,26 +1,60 @@
-const { Prompt } = require('../models');
+const { Prompt, User, Comment, Upvote, Downvote, Follow, Suggestion, Evolution, Notification } = require('../models');
+const { v4: uuidv4 } = require('uuid');
+const { SyntaxHighlighter } = require('react-syntax-highlighter');
+const { docco } = require('react-syntax-highlighter/dist/esm/styles/hljs');
 
-// Get all prompts
-// Get all prompts or by user
+// Get all prompts with sorting and search
 exports.getPrompts = async (req, res) => {
-    try {
-      const userId = req.query.user;
-      
-      let query = {};
-      if (userId) {
-        query.user = userId;
-      }
-      
-      const prompts = await Prompt.find(query)
-        .sort({ createdAt: -1 })
-        .populate('user', 'name avatar');
-      
-      res.json(prompts);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Server error' });
+  try {
+    const { sort = 'hot', search = '', page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
+    let query = {};
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { code: { $regex: search, $options: 'i' } }
+      ];
     }
-  };
+
+    let sortOptions = {};
+    switch (sort) {
+      case 'hot':
+        sortOptions = { karma: -1, createdAt: -1 };
+        break;
+      case 'new':
+        sortOptions = { createdAt: -1 };
+        break;
+      case 'top':
+        sortOptions = { karma: -1 };
+        break;
+    }
+
+    const prompts = await Prompt.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit)
+      .populate('author', 'name picture')
+      .populate('upvotes', 'user')
+      .populate('downvotes', 'user')
+      .populate('comments', 'author content')
+      .populate('forks', 'author title')
+      .populate('pullRequests', 'author title');
+
+    const total = await Prompt.countDocuments(query);
+    
+    res.json({
+      prompts,
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 // Get prompt by ID
 exports.getPromptById = async (req, res) => {
@@ -62,16 +96,28 @@ exports.getPromptsByUser = async (req, res) => {
 // Create prompt
 exports.createPrompt = async (req, res) => {
   try {
-    const { title, content, tags } = req.body;
+    const { title, description, code, language } = req.body;
+    const userId = req.user.id;
 
-    const newPrompt = new Prompt({
+    const prompt = await Prompt.create({
       title,
-      content,
-      tags,
-      user: req.user.id
+      description,
+      code,
+      language,
+      authorId: userId,
     });
 
-    const prompt = await newPrompt.save();
+    // Update user karma for creating a prompt
+    await User.update(
+      { karma: user.karma + 5 },
+      { where: { id: userId } }
+    );
+    
+    // Update user karma
+    const user = await User.findById(userId);
+    user.karma += 10; // Initial karma for creating a prompt
+    await user.save();
+
     res.status(201).json(prompt);
   } catch (err) {
     console.error(err);
@@ -132,31 +178,59 @@ exports.votePrompt = async (req, res) => {
   try {
     const { id } = req.params;
     const { voteType } = req.body; // 'up' or 'down'
+    const userId = req.user.id;
 
     const prompt = await Prompt.findById(id);
+    const user = await User.findById(userId);
 
     if (!prompt) {
       return res.status(404).json({ message: 'Prompt not found' });
     }
 
-    const upvoteIndex = prompt.upvotes.indexOf(req.user.id);
-    const downvoteIndex = prompt.downvotes.indexOf(req.user.id);
+    // Check if user has already voted
+    const existingUpvote = await Upvote.findOne({
+      userId,
+      promptId: id,
+    });
 
-    if (upvoteIndex > -1) prompt.upvotes.splice(upvoteIndex, 1);
-    if (downvoteIndex > -1) prompt.downvotes.splice(downvoteIndex, 1);
+    const existingDownvote = await Downvote.findOne({
+      userId,
+      promptId: id,
+    });
 
-    if (voteType === 'up') {
-      prompt.upvotes.push(req.user.id);
-    } else if (voteType === 'down') {
-      prompt.downvotes.push(req.user.id);
+    // Remove existing vote if present
+    if (voteType === 'up' && existingUpvote) {
+      await existingUpvote.deleteOne();
+      prompt.karma -= 1;
+    } else if (voteType === 'down' && existingDownvote) {
+      await existingDownvote.deleteOne();
+      prompt.karma += 1;
     }
 
-    await prompt.save();
+    // Create new vote
+    if (voteType === 'up' && !existingUpvote) {
+      const upvote = new Upvote({
+        userId,
+        promptId: id,
+      });
+      await upvote.save();
+      prompt.karma += 1;
+      user.karma += 1;
+    } else if (voteType === 'down' && !existingDownvote) {
+      const downvote = new Downvote({
+        userId,
+        promptId: id,
+      });
+      await downvote.save();
+      prompt.karma -= 1;
+      user.karma -= 1;
+    }
+
+    await Promise.all([prompt.save(), user.save()]);
 
     res.json({
-      upvotes: prompt.upvotes.length,
-      downvotes: prompt.downvotes.length,
-      voteCount: prompt.upvotes.length - prompt.downvotes.length
+      karma: prompt.karma,
+      userKarma: user.karma,
     });
   } catch (err) {
     console.error(err);

@@ -10,31 +10,31 @@ export default function SearchBar({ onSearch }) {
   };
   
   return (
-    <form onSubmit={handleSubmit} className="mb-6">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-grow">
+    <form onSubmit={handleSubmit} className='mb-6 w-full max-w-3xl mx-auto'>
+      <div className='flex flex-col md:flex-row gap-4'>
+        <div className='flex-grow'>
           <input
-            type="text"
-            placeholder="Search prompts..."
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            type='text'
+            placeholder='Search prompts...'
+            className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
         
-        <div className="flex-grow">
+        <div className='flex-grow'>
           <input
-            type="text"
-            placeholder="Filter by tags (comma separated)"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            type='text'
+            placeholder='Filter by tags (comma separated)'
+            className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             value={tags}
             onChange={(e) => setTags(e.target.value)}
           />
         </div>
         
         <button
-          type="submit"
-          className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          type='submit'
+          className='bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 whitespace-nowrap'
         >
           Search
         </button>

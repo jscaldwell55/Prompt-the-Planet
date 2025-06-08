@@ -1,123 +1,260 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
-import PromptCard from '../components/PromptCard';
+import React, { useState } from 'react';
+import {
+  Container,
+  Typography,
+  Box,
+  Grid,
+  Paper,
+  Avatar,
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Chip,
+  Button,
+} from '@mui/material';
+import {
+  Code as CodeIcon,
+  ThumbUp as ThumbUpIcon,
+  Comment as CommentIcon,
+  Star as StarIcon,
+  Edit as EditIcon,
+} from '@mui/icons-material';
 
-export default function Profile() {
-  const { currentUser, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
-  const [userPrompts, setUserPrompts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!authLoading && !currentUser) {
-      navigate('/login');
-    }
-  }, [currentUser, authLoading, navigate]);
-  
-  // Fetch user's prompts
-  useEffect(() => {
-    const fetchUserPrompts = async () => {
-      if (!currentUser) return;
-      
-      setLoading(true);
-      try {
-        const response = await api.get(`/prompts?user=${currentUser._id}`);
-        setUserPrompts(response.data);
-      } catch (err) {
-        console.error('Error fetching user prompts:', err);
-        setError('Failed to load your prompts.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchUserPrompts();
-  }, [currentUser]);
-  
-  const handleVote = (promptId, voteData) => {
-    // Update prompts with new vote data
-    setUserPrompts(prevPrompts => 
-      prevPrompts.map(prompt => 
-        prompt._id === promptId
-          ? { ...prompt, upvotes: voteData.upvotes, downvotes: voteData.downvotes }
-          : prompt
-      )
-    );
+const Profile = () => {
+  const [activeTab, setActiveTab] = useState(0);
+
+  // Mock user data - replace with actual API call
+  const user = {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    avatar: 'JD',
+    karma: 150,
+    joinDate: '2024-01-01',
+    prompts: [
+      {
+        id: '1',
+        title: 'Code Review Assistant',
+        description: 'An AI prompt to help review and improve code quality',
+        karma: 42,
+        createdAt: '2024-02-15',
+      },
+      {
+        id: '2',
+        title: 'Creative Writing Helper',
+        description: 'A prompt for generating creative writing ideas',
+        karma: 28,
+        createdAt: '2024-02-10',
+      },
+    ],
+    upvotes: [
+      {
+        id: '1',
+        title: 'AI Image Generation',
+        author: 'Jane Smith',
+        karma: 75,
+      },
+      {
+        id: '2',
+        title: 'Code Optimization',
+        author: 'Bob Wilson',
+        karma: 63,
+      },
+    ],
   };
-  
-  if (authLoading || !currentUser) {
-    return <div className="text-center py-10">Loading profile...</div>;
-  }
-  
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
   return (
-    <div className="py-8">
-      <div className="mb-8 flex flex-col md:flex-row items-center md:items-start gap-6">
-        <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200">
-          {currentUser.avatar ? (
-            <img 
-              src={currentUser.avatar} 
-              alt={currentUser.name} 
-              className="w-full h-full object-cover" 
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-2xl text-gray-500">
-              {currentUser.name.charAt(0).toUpperCase()}
-            </div>
-          )}
-        </div>
-        
-        <div>
-          <h1 className="text-2xl font-bold">{currentUser.name}</h1>
-          <p className="text-gray-600">{currentUser.email}</p>
-          
-          <div className="mt-4">
-            <Link 
-              to="/create" 
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Create New Prompt
-            </Link>
-          </div>
-        </div>
-      </div>
-      
-      <div className="border-b mb-6"></div>
-      
-      <h2 className="text-xl font-bold mb-6">Your Prompts</h2>
-      
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-          {error}
-        </div>
-      )}
-      
-      {loading ? (
-        <div className="text-center py-10">Loading your prompts...</div>
-      ) : userPrompts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {userPrompts.map(prompt => (
-            <PromptCard 
-              key={prompt._id} 
-              prompt={prompt}
-              onVote={handleVote}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-10 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-gray-600 mb-4">You haven't created any prompts yet.</p>
-          <Link 
-            to="/create" 
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={4}>
+          <Paper
+            sx={{
+              p: 3,
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 2,
+              textAlign: 'center',
+            }}
           >
-            Create Your First Prompt
-          </Link>
-        </div>
-      )}
-    </div>
+            <Avatar
+              sx={{
+                width: 120,
+                height: 120,
+                mx: 'auto',
+                mb: 2,
+                background: 'linear-gradient(45deg, #00ff87, #60efff)',
+                fontSize: '2.5rem',
+              }}
+            >
+              {user.avatar}
+            </Avatar>
+            <Typography variant="h5" sx={{ mb: 1 }}>
+              {user.name}
+            </Typography>
+            <Typography color="text.secondary" sx={{ mb: 2 }}>
+              {user.email}
+            </Typography>
+            <Box sx={{ mb: 2 }}>
+              <Chip
+                icon={<StarIcon />}
+                label={`${user.karma} Karma`}
+                sx={{
+                  backgroundColor: 'rgba(0, 255, 135, 0.1)',
+                  color: '#00ff87',
+                }}
+              />
+            </Box>
+            <Button
+              variant="outlined"
+              startIcon={<EditIcon />}
+              sx={{
+                borderColor: 'primary.main',
+                color: 'primary.main',
+                '&:hover': {
+                  borderColor: 'primary.light',
+                  backgroundColor: 'rgba(0, 255, 135, 0.1)',
+                },
+              }}
+            >
+              Edit Profile
+            </Button>
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={8}>
+          <Paper
+            sx={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 2,
+            }}
+          >
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              sx={{
+                borderBottom: 1,
+                borderColor: 'divider',
+                '& .MuiTab-root': {
+                  color: 'text.secondary',
+                  '&.Mui-selected': {
+                    color: 'primary.main',
+                  },
+                },
+              }}
+            >
+              <Tab label="My Prompts" />
+              <Tab label="Upvotes" />
+              <Tab label="Comments" />
+            </Tabs>
+
+            <Box sx={{ p: 3 }}>
+              {activeTab === 0 && (
+                <List>
+                  {user.prompts.map((prompt) => (
+                    <ListItem
+                      key={prompt.id}
+                      sx={{
+                        mb: 2,
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        borderRadius: 1,
+                      }}
+                    >
+                      <ListItemIcon>
+                        <CodeIcon sx={{ color: 'primary.main' }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={prompt.title}
+                        secondary={
+                          <>
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              color="text.secondary"
+                            >
+                              {prompt.description}
+                            </Typography>
+                            <Box sx={{ mt: 1 }}>
+                              <Chip
+                                size="small"
+                                icon={<ThumbUpIcon />}
+                                label={`${prompt.karma} Karma`}
+                                sx={{
+                                  backgroundColor: 'rgba(0, 255, 135, 0.1)',
+                                  color: '#00ff87',
+                                }}
+                              />
+                            </Box>
+                          </>
+                        }
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+
+              {activeTab === 1 && (
+                <List>
+                  {user.upvotes.map((item) => (
+                    <ListItem
+                      key={item.id}
+                      sx={{
+                        mb: 2,
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        borderRadius: 1,
+                      }}
+                    >
+                      <ListItemIcon>
+                        <ThumbUpIcon sx={{ color: 'primary.main' }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={item.title}
+                        secondary={
+                          <>
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              color="text.secondary"
+                            >
+                              by {item.author}
+                            </Typography>
+                            <Box sx={{ mt: 1 }}>
+                              <Chip
+                                size="small"
+                                icon={<StarIcon />}
+                                label={`${item.karma} Karma`}
+                                sx={{
+                                  backgroundColor: 'rgba(0, 255, 135, 0.1)',
+                                  color: '#00ff87',
+                                }}
+                              />
+                            </Box>
+                          </>
+                        }
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+
+              {activeTab === 2 && (
+                <Typography color="text.secondary" sx={{ textAlign: 'center' }}>
+                  No comments yet
+                </Typography>
+              )}
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Container>
   );
-}
+};
+
+export default Profile;

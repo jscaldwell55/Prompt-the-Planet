@@ -1,58 +1,70 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Grid, Paper, Typography, Button } from '@mui/material';
-import SearchBar from '../components/SearchBar';
+import React, { useState, useEffect } from 'react';
+import { Box, Container, Grid, Typography, TextField, InputAdornment } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import PromptCard from '../components/PromptCard';
+import { useTheme } from '@mui/material/styles';
 
-export default function Home() {
-  const handleSearch = (query, tags) => {
-    console.log('Searching for:', query, 'with tags:', tags);
-    // This will be connected to the API later
-  };
+const Home = () => {
+  const [prompts, setPrompts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const theme = useTheme();
+
+  useEffect(() => {
+    // TODO: Fetch prompts from API
+    // This will be implemented when we set up the backend
+  }, []);
 
   return (
-    <div className='scanline-background min-h-screen flex flex-col'>
-      <main className='flex-grow container mx-auto px-4 py-8'>
-        <Grid className='flex-grow container mx-auto px-4 py-8'>
-          <div className='flex-grow flex items-center justify-center'>
-            <Paper className='prompt-card p-6'>
-              <Typography variant='h1' className='text-4xl font-bold neon-glow-cyan mb-4'>Welcome</Typography>
-              <Typography variant='body1' className='mt-4 text-lg'>
-                Discover, create, and collaborate on AI prompts.
-              </Typography>
-              <div className='flex flex-wrap gap-4 mt-6'>
-                <Link to='/explore' className='neon-button'>Explore Prompts</Link>
-                <Link to='/help' className='neon-button'>Get Help</Link>
-                <Link to='/collaborate' className='neon-button'>Collaborate</Link>
-              </div>
-              <div className='mt-8'>
-                <SearchBar onSearch={handleSearch} />
-              </div>
-            </Paper>
-          </div>
-
-          {/* Simple stack of centered text with consistent styling */}
-          <div className='flex flex-col items-center justify-center mt-24 mb-16 space-y-8'>
-            {/* Force each title to be on a single line with nowrap */}
-            <Typography variant='h2' className='text-3xl font-bold neon-glow-cyan whitespace-nowrap'>
-              For Content Creators
-            </Typography>
-            
-            <Typography variant='h2' className='text-3xl font-bold neon-glow-cyan whitespace-nowrap'>
-              For Engineers
-            </Typography>
-            
-            <Typography variant='h2' className='text-3xl font-bold neon-glow-cyan whitespace-nowrap'>
-              For Vibe Coders
-            </Typography>
-          </div>
-        </Grid>
-      </main>
-
-      <footer className='py-4 text-center text-gray-500'>
-        <Typography variant='body2'>
-          {new Date().getFullYear()} NeonPrompt. All rights reserved.
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography
+          variant="h2"
+          component="h1"
+          sx={{
+            textAlign: 'center',
+            mb: 2,
+            background: 'linear-gradient(45deg, #00ff87, #60efff)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontWeight: 'bold',
+          }}
+        >
+          Discover AI Prompts
         </Typography>
-      </footer>
-    </div>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Search prompts..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: 2,
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              },
+            },
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ color: 'primary.main' }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
+
+      <Grid container spacing={3}>
+        {prompts.map((prompt) => (
+          <Grid item xs={12} sm={6} md={4} key={prompt.id}>
+            <PromptCard prompt={prompt} />
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
   );
-}
+};
+
+export default Home;

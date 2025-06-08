@@ -1,79 +1,163 @@
 import React from 'react';
-import { Grid, Paper, Typography, Button, List, ListItem, ListItemText } from '@mui/material';
-import { Link } from 'react-router-dom';
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
+import {
+  ExpandMore as ExpandMoreIcon,
+  Help as HelpIcon,
+  Code as CodeIcon,
+  Create as CreateIcon,
+  Share as ShareIcon,
+  Security as SecurityIcon,
+} from '@mui/icons-material';
 
-function Help() {
+const Help = () => {
+  const faqs = [
+    {
+      question: 'What is NeonPrompt?',
+      answer: 'NeonPrompt is a platform for creating, sharing, and collaborating on AI prompts. It helps users discover effective prompts, learn from others, and improve their AI interactions.',
+    },
+    {
+      question: 'How do I create a prompt?',
+      answer: 'To create a prompt, click the "Create" button in the navigation bar. Fill in the title, description, and content of your prompt. Add relevant tags and set the complexity level. Click "Create Prompt" to publish.',
+    },
+    {
+      question: 'How does voting work?',
+      answer: 'Users can upvote or downvote prompts to help the community identify the most effective ones. Your voting history is tracked, and you can change your vote at any time.',
+    },
+    {
+      question: 'What are prompt variations?',
+      answer: 'Prompt variations are different versions of the same prompt, created to explore different approaches or improvements. You can fork any prompt to create your own variation.',
+    },
+  ];
+
+  const features = [
+    {
+      icon: <CreateIcon />,
+      title: 'Create Prompts',
+      description: 'Create and share your AI prompts with the community',
+    },
+    {
+      icon: <CodeIcon />,
+      title: 'Code Integration',
+      description: 'Easily integrate prompts into your code and applications',
+    },
+    {
+      icon: <ShareIcon />,
+      title: 'Collaboration',
+      description: 'Work with others to improve and evolve prompts',
+    },
+    {
+      icon: <SecurityIcon />,
+      title: 'Security',
+      description: 'Secure authentication and data protection',
+    },
+  ];
+
   return (
-    <div className='scanline-background min-h-screen flex flex-col'>
-      <header className='flex items-center justify-between py-4'>
-        <Typography variant='h1' className='text-4xl font-bold neon-glow'>Help Center</Typography>
-        <nav className='flex space-x-4'>
-          <Link to='/create' className='neon-button'>Create Prompt</Link>
-          <Link to='/login' className='neon-button'>Login</Link>
-        </nav>
-      </header>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography
+        variant="h4"
+        component="h1"
+        sx={{
+          mb: 4,
+          textAlign: 'center',
+          background: 'linear-gradient(45deg, #00ff87, #60efff)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold',
+        }}
+      >
+        Help & Documentation
+      </Typography>
 
-      <main className='flex-grow container mx-auto px-4 py-4'>
-        <Grid container spacing={4} className='grid-layout'>
-          <Grid item xs={12}>
-            <Paper className='prompt-card p-4'>
-              <Typography variant='h2' className='neon-glow'>Prompt Engineering Help</Typography>
-              <div className='mt-4 space-y-4'>
-                <List>
-                  <ListItem>
-                    <ListItemText
-                      primary='Getting Started with Prompts'
-                      secondary='Learn the basics of prompt engineering'
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primary='Advanced Techniques'
-                      secondary='Master complex prompt patterns'
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primary='Common Issues'
-                      secondary='Troubleshooting guide'
-                    />
-                  </ListItem>
-                </List>
-              </div>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Paper className='prompt-card p-4'>
-              <Typography variant='h3' className='neon-glow'>Technical Documentation</Typography>
-              <div className='mt-4 space-y-4'>
-                <Button variant='outlined' className='neon-button w-full'>API Reference</Button>
-                <Button variant='outlined' className='neon-button w-full'>Parameter Guide</Button>
-                <Button variant='outlined' className='neon-button w-full'>Best Practices</Button>
-              </div>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Paper className='prompt-card p-4'>
-              <Typography variant='h3' className='neon-glow'>Community Support</Typography>
-              <div className='mt-4 space-y-4'>
-                <Button variant='outlined' className='neon-button w-full'>Ask a Question</Button>
-                <Button variant='outlined' className='neon-button w-full'>Browse Solutions</Button>
-                <Button variant='outlined' className='neon-button w-full'>View FAQs</Button>
-              </div>
-            </Paper>
-          </Grid>
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={8}>
+          <Paper
+            sx={{
+              p: 3,
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 2,
+            }}
+          >
+            <Typography variant="h5" sx={{ mb: 3 }}>
+              Frequently Asked Questions
+            </Typography>
+            {faqs.map((faq, index) => (
+              <Accordion
+                key={index}
+                sx={{
+                  background: 'transparent',
+                  '&:before': {
+                    display: 'none',
+                  },
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  sx={{
+                    '&:hover': {
+                      background: 'rgba(255, 255, 255, 0.05)',
+                    },
+                  }}
+                >
+                  <Typography>{faq.question}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography color="text.secondary">{faq.answer}</Typography>
+                </AccordionDetails>
+              </Accordion>
+            ))}
+          </Paper>
         </Grid>
-      </main>
 
-      <footer className='py-4 text-center text-gray-500'>
-        <Typography variant='body2'>
-          {new Date().getFullYear()} NeonPrompt. All rights reserved.
+        <Grid item xs={12} md={4}>
+          <Paper
+            sx={{
+              p: 3,
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 2,
+            }}
+          >
+            <Typography variant="h5" sx={{ mb: 3 }}>
+              Key Features
+            </Typography>
+            <List>
+              {features.map((feature, index) => (
+                <ListItem key={index} sx={{ py: 2 }}>
+                  <ListItemIcon sx={{ color: 'primary.main' }}>
+                    {feature.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={feature.title}
+                    secondary={feature.description}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+        </Grid>
+      </Grid>
+
+      <Box sx={{ mt: 4, textAlign: 'center' }}>
+        <Typography variant="body1" color="text.secondary">
+          Need more help? Contact us at support@neonprompt.com
         </Typography>
-      </footer>
-    </div>
+      </Box>
+    </Container>
   );
-}
+};
 
 export default Help;

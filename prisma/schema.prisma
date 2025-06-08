@@ -24,6 +24,7 @@ model User {
   following     Follow[]  @relation("Following")
   followers     Follow[]  @relation("Followers")
   notifications Notification[]
+  pullRequests  PullRequest[]
 }
 
 model Prompt {
@@ -35,6 +36,7 @@ model Prompt {
   version     Int       @default(1)
   views       Int       @default(0)
   karma       Int       @default(0)
+  complexity  Int       @default(1)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   author      User      @relation(fields: [authorId], references: [id])
@@ -47,6 +49,8 @@ model Prompt {
   variationOfId String?
   suggestions Suggestion[]
   evolution   Evolution[]
+  tags        Tag[]
+  pullRequests PullRequest[]
 }
 
 model Comment {
@@ -142,4 +146,29 @@ model Notification {
   commentId   String?
   pullRequest PullRequest? @relation(fields: [pullRequestId], references: [id])
   pullRequestId String?
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  prompts   Prompt[]
+}
+
+model PullRequest {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  status      String   @default("OPEN") // OPEN, MERGED, CLOSED
+  changes     Json     // Stores diff information
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  author      User     @relation(fields: [authorId], references: [id])
+  authorId    String
+  prompt      Prompt   @relation(fields: [promptId], references: [id])
+  promptId    String
+  comments    Comment[]
+  upvotes     Upvote[]
+  downvotes   Downvote[]
+  notifications Notification[]
 }

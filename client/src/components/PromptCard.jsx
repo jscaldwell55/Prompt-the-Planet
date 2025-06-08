@@ -1,81 +1,129 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { votePrompt } from '../services/promptService';
+import React from 'react';
+import {
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  Chip,
+  IconButton,
+  Stack,
+  Rating,
+} from '@mui/material';
+import {
+  ThumbUp as ThumbUpIcon,
+  ThumbDown as ThumbDownIcon,
+  Comment as CommentIcon,
+  Share as ShareIcon,
+} from '@mui/icons-material';
 
-export default function PromptCard({ prompt, onVote }) {
-  const { currentUser } = useAuth();
-  const [voting, setVoting] = useState(false);
-  
-  const handleVote = async (voteType) => {
-    if (!currentUser) {
-      // Redirect to login if not authenticated
-      window.location.href = '/login';
-      return;
-    }
-    
-    if (voting) return;
-    
-    setVoting(true);
-    try {
-      const result = await votePrompt(prompt._id, voteType);
-      
-      // Call parent component callback with updated vote data
-      if (onVote) {
-        onVote(prompt._id, result);
-      }
-    } catch (err) {
-      console.error('Vote error:', err);
-    } finally {
-      setVoting(false);
-    }
-  };
-  
+const PromptCard = ({ prompt }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-      <Link to={`/prompt/${prompt._id}`}>
-        <h2 className="text-xl font-semibold mb-2">{prompt.title}</h2>
-      </Link>
-      
-      <div className="bg-gray-50 p-4 rounded-md font-mono text-sm mb-3 overflow-auto">
-        {prompt.content}
-      </div>
-      
-      <div className="flex flex-wrap gap-2 mb-4">
-        {prompt.tags.map((tag, index) => (
-          <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-            {tag}
-          </span>
-        ))}
-      </div>
-      
-      <div className="flex justify-between items-center text-sm text-gray-500">
-        <div>
-          Posted by {prompt.user?.name || 'Anonymous'}
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <button 
-            className={`p-1 ${prompt.upvotes?.includes(currentUser?._id) ? 'text-blue-600' : ''}`}
-            onClick={() => handleVote('up')}
-            disabled={voting}
-          >
-            ▲
-          </button>
-          
-          <span>
-            {(prompt.upvotes?.length || 0) - (prompt.downvotes?.length || 0)}
-          </span>
-          
-          <button 
-            className={`p-1 ${prompt.downvotes?.includes(currentUser?._id) ? 'text-red-600' : ''}`}
-            onClick={() => handleVote('down')}
-            disabled={voting}
-          >
-            ▼
-          </button>
-        </div>
-      </div>
-    </div>
+    <Card
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'rgba(255, 255, 255, 0.05)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: 2,
+        transition: 'transform 0.2s, box-shadow 0.2s',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: '0 8px 24px rgba(0, 255, 135, 0.2)',
+        },
+      }}
+    >
+      <CardContent sx={{ flexGrow: 1 }}>
+        <Typography
+          variant="h6"
+          component="h2"
+          sx={{
+            mb: 1,
+            fontWeight: 'bold',
+            background: 'linear-gradient(45deg, #00ff87, #60efff)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          {prompt.title}
+        </Typography>
+
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            mb: 2,
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}
+        >
+          {prompt.description}
+        </Typography>
+
+        <Box sx={{ mb: 2 }}>
+          <Rating
+            value={prompt.complexity}
+            readOnly
+            size="small"
+            sx={{
+              '& .MuiRating-iconFilled': {
+                color: '#00ff87',
+              },
+            }}
+          />
+        </Box>
+
+        <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}>
+          {prompt.tags?.map((tag) => (
+            <Chip
+              key={tag.id}
+              label={tag.name}
+              size="small"
+              sx={{
+                backgroundColor: 'rgba(0, 255, 135, 0.1)',
+                color: '#00ff87',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 255, 135, 0.2)',
+                },
+              }}
+            />
+          ))}
+        </Stack>
+
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mt: 'auto',
+          }}
+        >
+          <Stack direction="row" spacing={1}>
+            <IconButton size="small" sx={{ color: '#00ff87' }}>
+              <ThumbUpIcon />
+            </IconButton>
+            <Typography variant="body2" color="text.secondary">
+              {prompt.karma}
+            </Typography>
+            <IconButton size="small" sx={{ color: '#ff4081' }}>
+              <ThumbDownIcon />
+            </IconButton>
+          </Stack>
+
+          <Stack direction="row" spacing={1}>
+            <IconButton size="small" sx={{ color: 'text.secondary' }}>
+              <CommentIcon />
+            </IconButton>
+            <IconButton size="small" sx={{ color: 'text.secondary' }}>
+              <ShareIcon />
+            </IconButton>
+          </Stack>
+        </Box>
+      </CardContent>
+    </Card>
   );
-}
+};
+
+export default PromptCard;

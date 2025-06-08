@@ -1,75 +1,129 @@
-import React from 'react';
-import { Grid, Paper, Typography, Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import {
+  Container,
+  Grid,
+  Typography,
+  Box,
+  Chip,
+  TextField,
+  InputAdornment,
+  Paper,
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import PromptCard from '../components/PromptCard';
 
-function Explore() {
+const categories = [
+  { id: 'coding', name: 'Coding', color: '#00ff87' },
+  { id: 'writing', name: 'Writing', color: '#60efff' },
+  { id: 'design', name: 'Design', color: '#ff4081' },
+  { id: 'business', name: 'Business', color: '#ffd700' },
+  { id: 'education', name: 'Education', color: '#9c27b0' },
+  { id: 'creative', name: 'Creative', color: '#ff9800' },
+];
+
+const Explore = () => {
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Mock data - replace with actual API call
+  const prompts = [
+    {
+      id: '1',
+      title: 'Code Review Assistant',
+      description: 'An AI prompt to help review and improve code quality',
+      complexity: 3,
+      tags: ['coding', 'review', 'quality'],
+      karma: 42,
+    },
+    // Add more mock prompts here
+  ];
+
   return (
-    <div className='scanline-background min-h-screen flex flex-col'>
-      <header className='flex items-center justify-between py-4'>
-        <Typography variant='h1' className='text-4xl font-bold neon-glow'>Explore</Typography>
-        <nav className='flex space-x-4'>
-          <Link to='/create' className='neon-button'>Create Prompt</Link>
-          <Link to='/login' className='neon-button'>Login</Link>
-        </nav>
-      </header>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography
+        variant="h4"
+        component="h1"
+        sx={{
+          mb: 4,
+          textAlign: 'center',
+          background: 'linear-gradient(45deg, #00ff87, #60efff)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold',
+        }}
+      >
+        Explore Prompts
+      </Typography>
 
-      <main className='flex-grow container mx-auto px-4 py-4'>
-        <Grid container spacing={4} className='grid-layout'>
-          <Grid item xs={12}>
-            <Paper className='prompt-card p-4'>
-              <Typography variant='h2' className='neon-glow'>Discover Prompts</Typography>
-              <div className='flex justify-between items-center mt-4'>
-                <div className='flex space-x-4'>
-                  <Button variant='outlined' className='neon-button'>Hot</Button>
-                  <Button variant='outlined' className='neon-button'>New</Button>
-                  <Button variant='outlined' className='neon-button'>Top</Button>
-                </div>
-                <Button variant='contained' className='neon-button'>View All</Button>
-              </div>
-            </Paper>
+      <Box sx={{ mb: 4 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Search prompts..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{
+            mb: 3,
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: 2,
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              },
+            },
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ color: 'primary.main' }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <Paper
+          sx={{
+            p: 2,
+            background: 'rgba(255, 255, 255, 0.05)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Categories
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {categories.map((category) => (
+              <Chip
+                key={category.id}
+                label={category.name}
+                onClick={() => setSelectedCategory(category.id)}
+                sx={{
+                  backgroundColor: selectedCategory === category.id
+                    ? `${category.color}33`
+                    : 'rgba(255, 255, 255, 0.1)',
+                  color: selectedCategory === category.id
+                    ? category.color
+                    : 'text.primary',
+                  '&:hover': {
+                    backgroundColor: `${category.color}33`,
+                  },
+                }}
+              />
+            ))}
+          </Box>
+        </Paper>
+      </Box>
+
+      <Grid container spacing={3}>
+        {prompts.map((prompt) => (
+          <Grid item xs={12} sm={6} md={4} key={prompt.id}>
+            <PromptCard prompt={prompt} />
           </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Paper className='prompt-card p-4'>
-              <Typography variant='h3' className='neon-glow'>Channels</Typography>
-              <div className='mt-4 space-y-2'>
-                <Button variant='outlined' className='neon-button w-full'>Writing</Button>
-                <Button variant='outlined' className='neon-button w-full'>Image</Button>
-                <Button variant='outlined' className='neon-button w-full'>Code</Button>
-                <Button variant='outlined' className='neon-button w-full'>Chat</Button>
-              </div>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Paper className='prompt-card p-4'>
-              <Typography variant='h3' className='neon-glow'>Trending</Typography>
-              <div className='mt-4 space-y-4'>
-                <div className='flex justify-between items-center'>
-                  <Typography variant='body1'>AI Storytelling</Typography>
-                  <Typography variant='body2' className='text-accent-main'>+250%</Typography>
-                </div>
-                <div className='flex justify-between items-center'>
-                  <Typography variant='body1'>Code Generation</Typography>
-                  <Typography variant='body2' className='text-accent-main'>+180%</Typography>
-                </div>
-                <div className='flex justify-between items-center'>
-                  <Typography variant='body1'>Image Prompting</Typography>
-                  <Typography variant='body2' className='text-accent-main'>+150%</Typography>
-                </div>
-              </div>
-            </Paper>
-          </Grid>
-        </Grid>
-      </main>
-
-      <footer className='py-4 text-center text-gray-500'>
-        <Typography variant='body2'>
-          {new Date().getFullYear()} NeonPrompt. All rights reserved.
-        </Typography>
-      </footer>
-    </div>
+        ))}
+      </Grid>
+    </Container>
   );
-}
+};
 
 export default Explore;

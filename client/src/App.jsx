@@ -1,39 +1,60 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import Nav from './components/Nav';
-import Footer from './components/Footer';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
+import Navbar from './components/Navbar';
 import Home from './pages/Home';
-import Login from './pages/Login';
-import CreatePrompt from './pages/CreatePrompt';
+import Create from './pages/Create';
 import Explore from './pages/Explore';
 import Help from './pages/Help';
 import Collaborate from './pages/Collaborate';
-import NotFound from './pages/NotFound';
-import theme from './theme';
-import './index.css';
+import Profile from './pages/Profile';
+import PullRequests from './pages/PullRequests';
+
+const theme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#00ff87',
+    },
+    secondary: {
+      main: '#60efff',
+    },
+    background: {
+      default: '#0a0a0a',
+      paper: '#1a1a1a',
+    },
+  },
+  typography: {
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+          minHeight: '100vh',
+        },
+      },
+    },
+  },
+});
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <div className='min-h-screen flex flex-col bg-background-default'>
-          <Nav />
-          <main className='flex-grow container mx-auto px-4 py-4'>
-            <Routes>
-              <Route path='/' element={<Home />} />
-              <Route path='/login' element={<Login />} />
-              <Route path='/create' element={<CreatePrompt />} />
-              <Route path='/explore' element={<Explore />} />
-              <Route path='/help' element={<Help />} />
-              <Route path='/collaborate' element={<Collaborate />} />
-              <Route path='*' element={<NotFound />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/create" element={<Create />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/collaborate" element={<Collaborate />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/prompts/:promptId/pull-requests" element={<PullRequests />} />
+        </Routes>
       </Router>
     </ThemeProvider>
   );

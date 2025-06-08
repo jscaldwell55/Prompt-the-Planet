@@ -1,77 +1,200 @@
-import React from 'react';
-import { Grid, Paper, Typography, Button, List, ListItem, ListItemText } from '@mui/material';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import {
+  Container,
+  Typography,
+  Box,
+  Grid,
+  Paper,
+  Button,
+  TextField,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Avatar,
+  Chip,
+} from '@mui/material';
+import {
+  Group as GroupIcon,
+  Code as CodeIcon,
+  Chat as ChatIcon,
+  Share as ShareIcon,
+} from '@mui/icons-material';
 
-function Collaborate() {
+const Collaborate = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Mock data - replace with actual API call
+  const projects = [
+    {
+      id: '1',
+      title: 'AI Code Review System',
+      description: 'Building an AI-powered code review system with advanced prompt engineering',
+      members: [
+        { id: '1', name: 'John Doe', avatar: 'JD' },
+        { id: '2', name: 'Jane Smith', avatar: 'JS' },
+      ],
+      tags: ['coding', 'review', 'collaboration'],
+      status: 'active',
+    },
+    {
+      id: '2',
+      title: 'Creative Writing Prompts',
+      description: 'Collection of creative writing prompts for various genres',
+      members: [
+        { id: '3', name: 'Alice Johnson', avatar: 'AJ' },
+        { id: '4', name: 'Bob Wilson', avatar: 'BW' },
+      ],
+      tags: ['writing', 'creative', 'community'],
+      status: 'active',
+    },
+  ];
+
   return (
-    <div className='scanline-background min-h-screen flex flex-col'>
-      <header className='flex items-center justify-between py-4'>
-        <Typography variant='h1' className='text-4xl font-bold neon-glow'>Collaborate</Typography>
-        <nav className='flex space-x-4'>
-          <Link to='/create' className='neon-button'>Create Prompt</Link>
-          <Link to='/login' className='neon-button'>Login</Link>
-        </nav>
-      </header>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography
+        variant="h4"
+        component="h1"
+        sx={{
+          mb: 4,
+          textAlign: 'center',
+          background: 'linear-gradient(45deg, #00ff87, #60efff)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold',
+        }}
+      >
+        Collaborate on Prompts
+      </Typography>
 
-      <main className='flex-grow container mx-auto px-4 py-4'>
-        <Grid container spacing={4} className='grid-layout'>
-          <Grid item xs={12}>
-            <Paper className='prompt-card p-4'>
-              <Typography variant='h2' className='neon-glow'>Collaborative Workspace</Typography>
-              <div className='mt-4 space-y-4'>
-                <Button variant='contained' className='neon-button'>Create New Project</Button>
-              </div>
-            </Paper>
+      <Box sx={{ mb: 4 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={8}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Search collaboration projects..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: 2,
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                },
+              }}
+            />
           </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Paper className='prompt-card p-4'>
-              <Typography variant='h3' className='neon-glow'>Recent Activity</Typography>
-              <div className='mt-4 space-y-4'>
-                <List>
-                  <ListItem>
-                    <ListItemText
-                      primary='Prompt Optimization Project'
-                      secondary='2 new variations added'
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primary='AI Storytelling Workshop'
-                      secondary='3 active contributors'
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primary='Code Generation Initiative'
-                      secondary='1 improvement accepted'
-                    />
-                  </ListItem>
-                </List>
-              </div>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Paper className='prompt-card p-4'>
-              <Typography variant='h3' className='neon-glow'>Popular Projects</Typography>
-              <div className='mt-4 space-y-4'>
-                <Button variant='outlined' className='neon-button w-full'>AI Art Generation</Button>
-                <Button variant='outlined' className='neon-button w-full'>Code Optimization</Button>
-                <Button variant='outlined' className='neon-button w-full'>Storytelling Framework</Button>
-              </div>
-            </Paper>
+          <Grid item xs={12} md={4}>
+            <Button
+              variant="contained"
+              fullWidth
+              startIcon={<GroupIcon />}
+              sx={{
+                height: '100%',
+                background: 'linear-gradient(45deg, #00ff87, #60efff)',
+                '&:hover': {
+                  background: 'linear-gradient(45deg, #00cc6a, #4bc8ff)',
+                },
+              }}
+            >
+              New Project
+            </Button>
           </Grid>
         </Grid>
-      </main>
+      </Box>
 
-      <footer className='py-4 text-center text-gray-500'>
-        <Typography variant='body2'>
-          {new Date().getFullYear()} NeonPrompt. All rights reserved.
-        </Typography>
-      </footer>
-    </div>
+      <Grid container spacing={3}>
+        {projects.map((project) => (
+          <Grid item xs={12} key={project.id}>
+            <Paper
+              sx={{
+                p: 3,
+                background: 'rgba(255, 255, 255, 0.05)',
+                backdropFilter: 'blur(10px)',
+                borderRadius: 2,
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                },
+              }}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={8}>
+                  <Typography variant="h6" sx={{ mb: 1 }}>
+                    {project.title}
+                  </Typography>
+                  <Typography color="text.secondary" sx={{ mb: 2 }}>
+                    {project.description}
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                    {project.tags.map((tag) => (
+                      <Chip
+                        key={tag}
+                        label={tag}
+                        size="small"
+                        sx={{
+                          backgroundColor: 'rgba(0, 255, 135, 0.1)',
+                          color: '#00ff87',
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <List>
+                    {project.members.map((member) => (
+                      <ListItem key={member.id}>
+                        <ListItemAvatar>
+                          <Avatar
+                            sx={{
+                              background: 'linear-gradient(45deg, #00ff87, #60efff)',
+                            }}
+                          >
+                            {member.avatar}
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary={member.name} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Grid>
+              </Grid>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: 1,
+                  mt: 2,
+                }}
+              >
+                <Button
+                  startIcon={<CodeIcon />}
+                  sx={{ color: 'text.primary' }}
+                >
+                  View Code
+                </Button>
+                <Button
+                  startIcon={<ChatIcon />}
+                  sx={{ color: 'text.primary' }}
+                >
+                  Chat
+                </Button>
+                <Button
+                  startIcon={<ShareIcon />}
+                  sx={{ color: 'text.primary' }}
+                >
+                  Share
+                </Button>
+              </Box>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
   );
-}
+};
 
 export default Collaborate;
